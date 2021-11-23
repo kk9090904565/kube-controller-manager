@@ -1,17 +1,19 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
-ARG KUBERNETES_VERSION=v1.16.10
+ARG KUBERNETES_VERSION=v1.21.7
 
 ENV DEBIAN_FRONTEND=noninteractive \
     container=docker \
     KUBERNETES_DOWNLOAD_ROOT=https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64 \
-    KUBERNETES_COMPONENT=kube-controller-manager
+    KUBERNETES_COMPONENT=kube-controller-manager \
+    CEPH_DISTRIBUTION=octopus    
 
 RUN set -x \
     && apt-get update \
+    && apt install gnupg -y \
     && apt install wget apt-transport-https ca-certificates -y \
     && wget -q -O- 'https://download.ceph.com/keys/release.asc' | apt-key add - \
-    && echo deb https://download.ceph.com/debian-nautilus/ xenial main | tee /etc/apt/sources.list.d/ceph.list \
+    && echo deb https://download.ceph.com/debian-${CEPH_DISTRIBUTION}/ bionic main | tee /etc/apt/sources.list.d/ceph.list \
     && apt-get update \
     && apt-get install -y \
         ceph-common \
